@@ -2,12 +2,10 @@ package main
 
 import (
 	"PLAYLISTBOOK/config"
-	"fmt"
+	"PLAYLISTBOOK/server"
 )
 
 func main() {
-
 	config.Init()
-	fmt.Println(config.Get())
-
+	server.NewServer()
 }
