@@ -1,0 +1,3 @@
+module PLAYLISTBOOK
+
+go 1.17
