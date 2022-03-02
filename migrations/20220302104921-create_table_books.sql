@@ -1,0 +1,17 @@
+
+-- +migrate Up
+CREATE TABLE books (
+	id INT(3) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	description TEXT,
+	quantity INT(100) NOT NULL,
+	author VARCHAR(100) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_by VARCHAR(100) NOT NULL,
+	updated_at TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+	updated_by VARCHAR(100) DEFAULT NULL,
+	FOREIGN KEY (created_by) REFERENCES users(username),
+	FOREIGN KEY (updated_by) REFERENCES users(username)
+);
+-- +migrate Down
+DROP TABLE IF EXISTS books;
