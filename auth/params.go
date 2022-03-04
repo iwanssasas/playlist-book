@@ -7,3 +7,8 @@ type RegisterParams struct {
 	Email     string `form:"email"`
 	Password  string `form:"password"`
 }
+
+type LoginParams struct {
+	Identity string `form:"identity"`
+	Password string `form:"password"`
+}

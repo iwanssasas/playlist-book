@@ -23,10 +23,25 @@ func (h Handler) handleRegister(c *gin.Context) {
 	ctx := context.Background()
 	var params RegisterParams
 	if err := c.ShouldBindJSON(&params); err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
 	data, err := h.service.Register(ctx, params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response(data))
+}
+
+func (h Handler) handleLogin(c *gin.Context) {
+	ctx := context.Background()
+	var params LoginParams
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
+		return
+	}
+	data, err := h.service.Login(ctx, params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
