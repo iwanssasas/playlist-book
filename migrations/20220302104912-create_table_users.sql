@@ -6,11 +6,11 @@ CREATE TABLE users (
     firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100),
     email VARCHAR(100) NOT NULL UNIQUE,
-    PASSWORD VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     role_id INT(3),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (role_id) REFERENCES roles(id)
+    CONSTRAINT users_fk FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
 -- +migrate Down
