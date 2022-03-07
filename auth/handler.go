@@ -48,3 +48,14 @@ func (h Handler) handleLogin(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, utils.Response(data))
 }
+
+func (h Handler) handlePing(c *gin.Context) {
+
+	ctx := context.Background()
+	data, err := h.service.Ping(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response(data))
+}
