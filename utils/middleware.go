@@ -52,5 +52,6 @@ func TokenVerify() gin.HandlerFunc {
 			c.Set(key, val)
 		}
 		c.Next()
+
 	}
 }
