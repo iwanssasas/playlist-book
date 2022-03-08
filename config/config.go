@@ -17,7 +17,7 @@ type Config struct {
 	DbPassword      string        `envconfig:"DB_PASS" default:"root2"`
 	RoleId          int           `envconfig:"DEFAULT_ROLE_ID" default:"1"`
 	Secret          string        `envconfig:"SECRET" default:"PLAYLISTBOOK"`
-	ExpiredDuration time.Duration `envconfig:"EXP_DURATION" default:"12h"`
+	ExpiredDuration time.Duration `envconfig:"EXP_DURATION" default:"10h"`
 }
 
 func Init() {

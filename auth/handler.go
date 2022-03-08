@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -50,7 +51,7 @@ func (h Handler) handleLogin(c *gin.Context) {
 }
 
 func (h Handler) handlePing(c *gin.Context) {
-
+	fmt.Println(c.Get("email"))
 	ctx := context.Background()
 	data, err := h.service.Ping(ctx)
 	if err != nil {
