@@ -16,5 +16,5 @@ type UserModel struct {
 	Lastname  string `db:"lastname"`
 	Email     string `db:"email"`
 	Password  string `db:"password"`
-	RoleId    int    `db:"role_id"`
+	Role      string `db:"role"`
 }

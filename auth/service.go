@@ -63,7 +63,7 @@ func (s Service) Login(ctx context.Context, params LoginParams) (*LoginResponse,
 		"id":       fmt.Sprint(user.ID),
 		"username": user.Username,
 		"email":    user.Email,
-		"role":     fmt.Sprint(user.RoleId),
+		"role":     user.Role,
 	}
 	token, err := utils.GenerateToken(config.Secret, config.ExpiredDuration, data)
 	if err != nil {
@@ -74,7 +74,7 @@ func (s Service) Login(ctx context.Context, params LoginParams) (*LoginResponse,
 		Username: user.Username,
 		Fullname: user.Firstname + user.Lastname,
 		Email:    user.Email,
-		RoleId:   user.RoleId,
+		Role:     user.Role,
 		Token:    *token,
 	}
 	return result, nil

@@ -24,15 +24,16 @@ var (
 	`
 	selectUser = `
 	SELECT
-		id,
-		username,
-		firstname,
-		lastname,
-		email,
-		password,
-		role_id
+		u.id,
+		u.username,
+		u.firstname,
+		u.lastname,
+		u.email,
+		u.password,
+		r.name AS role
 	FROM
-		users
+		users u
+    JOIN roles r ON u.role_id = r.id
 	`
 )
 

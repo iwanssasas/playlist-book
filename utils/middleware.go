@@ -5,6 +5,7 @@ import (
 	"PLAYLISTBOOK/errs"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -52,6 +53,19 @@ func TokenVerify() gin.HandlerFunc {
 			c.Set(key, val)
 		}
 		c.Next()
+	}
+}
 
+func Authorization(roles []string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		for _, val := range roles {
+			if strings.EqualFold(val, c.GetString("role")) {
+				c.Next()
+				return
+			}
+		}
+		err := fmt.Errorf("Forbidden")
+		c.JSON(http.StatusForbidden, ErrorResponse(err))
+		c.Abort()
 	}
 }

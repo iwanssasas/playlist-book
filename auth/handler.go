@@ -59,3 +59,7 @@ func (h Handler) handlePing(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, utils.Response(data))
 }
+
+func (h Handler) handleAdmin(c *gin.Context) {
+	c.JSON(http.StatusOK, utils.Response("Admin Only!"))
+}
