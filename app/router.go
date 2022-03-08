@@ -1,8 +1,17 @@
 package app
 
-import "github.com/gin-gonic/gin"
+import (
+	"PLAYLISTBOOK/utils"
+
+	"github.com/gin-gonic/gin"
+)
 
 func NewRouter(router *gin.Engine, service Service) {
 	handler := NewHandler(service)
-	router.GET("/", handler.handleTest)
+
+	auth := router.Group("/", utils.TokenVerify())
+	{
+		auth.GET("/test", handler.handleTest)
+		auth.POST("/book", utils.Authorization([]string{"admin"}), handler.handleSubmitBook)
+	}
 }
