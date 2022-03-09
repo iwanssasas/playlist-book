@@ -12,6 +12,10 @@ func NewRouter(router *gin.Engine, service Service) {
 	auth := router.Group("/", utils.TokenVerify())
 	{
 		auth.GET("/test", handler.handleTest)
-		auth.POST("/book", utils.Authorization([]string{"admin"}), handler.handleSubmitBook)
+		auth.POST("/books", utils.Authorization([]string{"admin"}), handler.handleSubmitBook)
+		auth.GET("/books", handler.handleSelectAllBook)
+		auth.PUT("/books/:id", handler.handleUpdateBookById)
+		auth.DELETE("/books/:id", handler.handleDeleteBookById)
+
 	}
 }
