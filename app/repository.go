@@ -35,7 +35,10 @@ var (
 		updated_at,
 		updated_by
 	FROM
-		books;
+		books
+	ORDER BY 
+		name
+	LIMIT ? OFFSET ?;
 	`
 	deleteBook = `
 	DELETE FROM books
@@ -52,6 +55,9 @@ var (
 	WHERE 
 		id = :id;
 	`
+	selectTotalRow = `
+    SELECT COUNT(id) FROM books
+    `
 )
 
 func (r Repository) SubmitBook(ctx context.Context, params BookModel) error {
@@ -62,12 +68,20 @@ func (r Repository) SubmitBook(ctx context.Context, params BookModel) error {
 	return nil
 }
 
-func (r Repository) SelectAllBook(ctx context.Context) (ViewBookModels, error) {
+func (r Repository) SelectAllBook(ctx context.Context, offset int, limit int) (ViewBookModels, error) {
 	var dest ViewBookModels
-
-	err := r.db.SelectContext(ctx, &dest, selectAllBook)
+	err := r.db.SelectContext(ctx, &dest, selectAllBook, limit, offset)
 	if err != nil {
 		return nil, err
+	}
+	return dest, nil
+}
+
+func (r Repository) GetTotalRow(ctx context.Context) (int, error) {
+	var dest int
+	err := r.db.GetContext(ctx, &dest, selectTotalRow)
+	if err != nil {
+		return 0, err
 	}
 	return dest, nil
 }

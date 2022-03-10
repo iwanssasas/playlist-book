@@ -18,6 +18,7 @@ type Config struct {
 	RoleId          int           `envconfig:"DEFAULT_ROLE_ID" default:"1"`
 	Secret          string        `envconfig:"SECRET" default:"PLAYLISTBOOK"`
 	ExpiredDuration time.Duration `envconfig:"EXP_DURATION" default:"10h"`
+	LimitPage       int           `envconfig:"LIMITPAGE" default:"2"`
 }
 
 func Init() {

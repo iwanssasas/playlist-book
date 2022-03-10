@@ -1,6 +1,7 @@
 package app
 
 import (
+	"PLAYLISTBOOK/config"
 	"PLAYLISTBOOK/db"
 	"context"
 	"strconv"
@@ -34,13 +35,25 @@ func (s Service) SubmitBook(ctx context.Context, params BookParams, name string)
 	return &done, nil
 }
 
-func (s Service) selectAllBook(ctx context.Context) (*SelectBookResponses, error) {
+func (s Service) selectAllBook(ctx context.Context, pageStr string) (*DataBookResponse, error) {
+	config := config.Get()
 	dest := SelectBookResponses{}
-	get, err := s.repository.SelectAllBook(ctx)
+
+	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		return nil, err
 	}
+	limit := config.LimitPage
+	offset := (limit * page) - limit
 
+	totalRow, err := s.repository.GetTotalRow(ctx)
+	if err != nil {
+		return nil, err
+	}
+	get, err := s.repository.SelectAllBook(ctx, offset, limit)
+	if err != nil {
+		return nil, err
+	}
 	for _, val := range get {
 		dest = append(dest, SelectBookResponse{
 			ID:          val.ID,
@@ -53,9 +66,15 @@ func (s Service) selectAllBook(ctx context.Context) (*SelectBookResponses, error
 			UpdateAt:    val.UpdateAt,
 			UpdateBy:    val.UpdateBy,
 		})
-
 	}
-	return &dest, nil
+
+	result := DataBookResponse{
+		Page:     page,
+		Limit:    limit,
+		TotalRow: totalRow,
+		Data:     dest,
+	}
+	return &result, nil
 }
 
 func (s Service) DeleteBookById(stringId string) error {

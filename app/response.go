@@ -23,3 +23,10 @@ type SelectBookResponse struct {
 }
 
 type SelectBookResponses []SelectBookResponse
+
+type DataBookResponse struct {
+	Page     int                 `json:"id"`
+	Limit    int                 `json:"limit"`
+	TotalRow int                 `json:"total_row"`
+	Data     SelectBookResponses `json:"data_book"`
+}

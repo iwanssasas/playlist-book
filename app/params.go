@@ -6,3 +6,7 @@ type BookParams struct {
 	Quantity    int    `form:"quantity"`
 	Author      string `form:"author"`
 }
+
+type QueryParams struct {
+	Page string `form:"page" binding:require`
+}

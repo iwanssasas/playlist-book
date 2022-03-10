@@ -22,6 +22,10 @@ type ViewBookModel struct {
 	UpdateBy    *string    `db:"updated_by"`
 }
 
+type TotalRowModel struct {
+	Total int `db:"total"`
+}
+
 type ViewBookModels []ViewBookModel
 
 type UpdateBookModel struct {

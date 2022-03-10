@@ -20,7 +20,9 @@ func NewHandler(s Service) Handler {
 
 func (h Handler) handleTest(c *gin.Context) {
 	name := c.GetString("username")
-	c.JSON(http.StatusOK, name)
+	offset := c.Query("offset")
+	limit := c.Query("limit")
+	c.JSON(http.StatusOK, name+limit+offset)
 }
 
 func (h Handler) handleSubmitBook(c *gin.Context) {
@@ -41,7 +43,8 @@ func (h Handler) handleSubmitBook(c *gin.Context) {
 
 func (h Handler) handleSelectAllBook(c *gin.Context) {
 	ctx := context.Background()
-	response, err := h.service.selectAllBook(ctx)
+	page := c.Query("page")
+	response, err := h.service.selectAllBook(ctx, page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
