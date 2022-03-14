@@ -62,3 +62,18 @@ func (h Handler) handlePing(c *gin.Context) {
 func (h Handler) handleAdmin(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.Response("Admin Only!"))
 }
+
+func (h Handler) handleOauthGoogle(c *gin.Context) {
+	url := getGoogleOauth2().AuthCodeURL(oauthStateString)
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (h Handler) handleGoogleCallback(c *gin.Context) {
+	ctx := context.Background()
+	content, err := h.service.googleCallback(ctx, c.Query("state"), c.Query("code"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response(content))
+}

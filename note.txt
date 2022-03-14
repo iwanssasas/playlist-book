@@ -1,0 +1,3 @@
+sh ./migrate.sh up
+
+sh ./migrate.sh new edit_table_user

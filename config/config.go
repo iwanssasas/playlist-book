@@ -19,6 +19,9 @@ type Config struct {
 	Secret          string        `envconfig:"SECRET" default:"PLAYLISTBOOK"`
 	ExpiredDuration time.Duration `envconfig:"EXP_DURATION" default:"10h"`
 	LimitPage       int           `envconfig:"LIMITPAGE" default:"2"`
+
+	GoogleClientId     string `envconfig:"GOOGLE_CLIENT_ID" default:"120468716859-taqf0kjaci78btltfbkii2eoogi00gan.apps.googleusercontent.com"`
+	GoogleClientSecret string `envconfig:"GOOGLE_CLIENT_SECRET" default:"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"`
 }
 
 func Init() {

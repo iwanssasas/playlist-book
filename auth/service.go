@@ -5,8 +5,11 @@ import (
 	"PLAYLISTBOOK/db"
 	"PLAYLISTBOOK/utils"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"context"
 )
@@ -83,4 +86,30 @@ func (s Service) Login(ctx context.Context, params LoginParams) (*LoginResponse,
 func (s Service) Ping(ctx context.Context) (string, error) {
 	user := "Pong"
 	return user, nil
+}
+
+func (s Service) googleCallback(ctx context.Context, state string, code string) (*Oauth2GoogleResponse, error) {
+	if state != oauthStateString {
+		return nil, errors.New("invalid oauth state")
+	}
+	token, err := getGoogleOauth2().Exchange(ctx, code)
+	if err != nil {
+		return nil, errors.New("code exchange failed")
+	}
+	response, err := http.Get(googleApis + token.AccessToken)
+	if err != nil {
+		return nil, errors.New("failed getting user info")
+	}
+
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed reading response body: %s", err.Error())
+	}
+	var data Oauth2GoogleResponse
+	err = json.Unmarshal(contents, &data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
 }

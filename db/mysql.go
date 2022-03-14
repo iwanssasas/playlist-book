@@ -18,7 +18,7 @@ func New() *sqlx.DB {
 	)
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
-		log.Fatal("connection error")
+		log.Fatal("DB: connection error")
 	}
 
 	db.SetConnMaxLifetime(time.Minute)
