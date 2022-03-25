@@ -12,6 +12,8 @@ import (
 	"net/http"
 
 	"context"
+
+	"github.com/bxcodec/faker/v3"
 )
 
 type Service struct {
@@ -112,4 +114,55 @@ func (s Service) googleCallback(ctx context.Context, state string, code string) 
 		return nil, err
 	}
 	return &data, nil
+}
+
+func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleResponse) (*LoginResponse, error) {
+	config := config.Get()
+	hasing, err := utils.GeneratePassword(faker.Password())
+	if err != nil {
+		return nil, err
+	}
+
+	createdRegisterGoogleOauth := RegistrationModel{
+		GoogleId:  &data.ID,
+		Username:  faker.Username(),
+		Firstname: faker.FirstName(),
+		Lastname:  faker.LastName(),
+		Email:     data.Email,
+		Password:  string(hasing),
+		IsEdited:  &config.IsEditedGoogle,
+		RoleId:    config.RoleId,
+	}
+	err = s.repository.Register(ctx, createdRegisterGoogleOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	isiData := map[string]string{
+		"id":       fmt.Sprint(user.ID),
+		"username": user.Username,
+		"email":    user.Email,
+		"role":     user.Role,
+	}
+	token, err := utils.GenerateToken(config.Secret, config.ExpiredDuration, isiData)
+	if err != nil {
+		return nil, err
+	}
+	result := &LoginResponse{
+		ID:       user.ID,
+		Username: user.Username,
+		Fullname: user.Firstname + user.Lastname,
+		Email:    user.Email,
+		Role:     user.Role,
+		Token:    *token,
+	}
+	return result, nil
 }

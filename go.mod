@@ -3,6 +3,7 @@ module PLAYLISTBOOK
 go 1.17
 
 require (
+	github.com/bxcodec/faker/v3 v3.8.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-sql-driver/mysql v1.6.0

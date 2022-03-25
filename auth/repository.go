@@ -13,12 +13,14 @@ type Repository struct {
 var (
 	insertRegister = `
 	INSERT INTO
-    users (username, firstname, lastname, email, password, role_id) value (
+    users (google_id, username, firstname, lastname, email, password,is_edited, role_id) value (
+		:google_id,
         :username,
         :firstname,
         :lastname,
         :email,
         :password,
+		:is_edited,
         :role_id
     );
 	`
@@ -49,6 +51,16 @@ func (r Repository) GetUserByIdentity(ctx context.Context, identity string) (*Us
 	query := selectUser + " WHERE username = ? OR email = ? LIMIT 1"
 	dest := &UserModel{}
 	err := r.db.GetContext(ctx, dest, query, identity, identity)
+	if err != nil {
+		return nil, err
+	}
+	return dest, nil
+}
+
+func (r Repository) GetUserByIdGoogle(ctx context.Context, id string) (*UserModel, error) {
+	query := selectUser + " WHERE google_id = ? LIMIT 1"
+	dest := &UserModel{}
+	err := r.db.GetContext(ctx, dest, query, id)
 	if err != nil {
 		return nil, err
 	}
