@@ -145,9 +145,6 @@ func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleRespo
 
 		NewUser, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
 		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return nil, errors.New("user not found")
-			}
 			return nil, err
 		}
 		user = NewUser
