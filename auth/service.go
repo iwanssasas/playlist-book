@@ -118,32 +118,39 @@ func (s Service) googleCallback(ctx context.Context, state string, code string) 
 
 func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleResponse) (*LoginResponse, error) {
 	config := config.Get()
-	hasing, err := utils.GeneratePassword(faker.Password())
-	if err != nil {
-		return nil, err
-	}
+	var user *UserModel
 
-	createdRegisterGoogleOauth := RegistrationModel{
-		GoogleId:  &data.ID,
-		Username:  faker.Username(),
-		Firstname: faker.FirstName(),
-		Lastname:  faker.LastName(),
-		Email:     data.Email,
-		Password:  string(hasing),
-		IsEdited:  &config.IsEditedGoogle,
-		RoleId:    config.RoleId,
-	}
-	err = s.repository.Register(ctx, createdRegisterGoogleOauth)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.New("user not found")
+	ExistUser, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
+	user = ExistUser
+	if errors.Is(err, sql.ErrNoRows) {
+		hasing, err := utils.GeneratePassword(faker.Password())
+		if err != nil {
+			return nil, err
 		}
-		return nil, err
+
+		createdRegisterGoogleOauth := RegistrationModel{
+			GoogleId:  &data.ID,
+			Username:  faker.Username(),
+			Firstname: faker.FirstName(),
+			Lastname:  faker.LastName(),
+			Email:     data.Email,
+			Password:  string(hasing),
+			IsEdited:  &config.IsEditedGoogle,
+			RoleId:    config.RoleId,
+		}
+		err = s.repository.Register(ctx, createdRegisterGoogleOauth)
+		if err != nil {
+			return nil, err
+		}
+
+		NewUser, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, errors.New("user not found")
+			}
+			return nil, err
+		}
+		user = NewUser
 	}
 
 	isiData := map[string]string{
