@@ -7,7 +7,7 @@ type RegistrationModel struct {
 	Lastname  string  `db:"lastname"`
 	Email     string  `db:"email"`
 	Password  string  `db:"password"`
-	IsEdited  *bool   `db:"is_edited"`
+	IsEdited  bool    `db:"is_edited"`
 	RoleId    int     `db:"role_id"`
 }
 
@@ -19,6 +19,6 @@ type UserModel struct {
 	Lastname  string  `db:"lastname"`
 	Email     string  `db:"email"`
 	Password  string  `db:"password"`
-	IsEdited  *bool   `db:"is_edited"`
+	IsEdited  bool    `db:"is_edited"`
 	Role      string  `db:"role"`
 }

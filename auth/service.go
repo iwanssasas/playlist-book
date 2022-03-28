@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"context"
 
@@ -65,7 +66,7 @@ func (s Service) Login(ctx context.Context, params LoginParams) (*LoginResponse,
 		return nil, errors.New("password didn't match")
 	}
 	data := map[string]string{
-		"id":       fmt.Sprint(user.ID),
+		"id":       strconv.Itoa(user.ID),
 		"username": user.Username,
 		"email":    user.Email,
 		"role":     user.Role,
@@ -114,15 +115,20 @@ func (s Service) googleCallback(ctx context.Context, state string, code string) 
 		return nil, err
 	}
 	return &data, nil
+
 }
 
 func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleResponse) (*LoginResponse, error) {
 	config := config.Get()
+
 	var user *UserModel
 
-	ExistUser, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
-	user = ExistUser
-	if errors.Is(err, sql.ErrNoRows) {
+	user, err := s.repository.GetUserByEmail(ctx, data.Email)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+
 		hasing, err := utils.GeneratePassword(faker.Password())
 		if err != nil {
 			return nil, err
@@ -135,20 +141,35 @@ func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleRespo
 			Lastname:  faker.LastName(),
 			Email:     data.Email,
 			Password:  string(hasing),
-			IsEdited:  &config.IsEditedGoogle,
+			IsEdited:  true,
 			RoleId:    config.RoleId,
 		}
-		err = s.repository.Register(ctx, createdRegisterGoogleOauth)
+		fmt.Println(createdRegisterGoogleOauth)
+		err = s.repository.RegisterGoogle(ctx, createdRegisterGoogleOauth)
 		if err != nil {
 			return nil, err
 		}
 
-		NewUser, err := s.repository.GetUserByIdGoogle(ctx, data.ID)
+		NewUser, err := s.repository.GetUserByEmail(ctx, data.Email)
 		if err != nil {
 			return nil, err
 		}
+
 		user = NewUser
+
+		// err no rows
+		// lanjut create user baru
+		// get data baru -> ambil id
 	}
+
+	if user.GoogleId == nil {
+		err = s.repository.UpdateGoogleId(ctx, data.ID, data.Email)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	fmt.Println("USER ID => ", user.ID)
 
 	isiData := map[string]string{
 		"id":       fmt.Sprint(user.ID),
@@ -156,6 +177,7 @@ func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleRespo
 		"email":    user.Email,
 		"role":     user.Role,
 	}
+	// fmt.Pritln()
 	token, err := utils.GenerateToken(config.Secret, config.ExpiredDuration, isiData)
 	if err != nil {
 		return nil, err
