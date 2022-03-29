@@ -35,30 +35,30 @@ var (
 	`
 	insertRegisterGoogle = `
 	INSERT INTO
-	users (
-		google_id,
-		username,
-		firstname,
-		lastname,
-		email,
-		password,
-		is_edited,
-		role_id
-	)
-VALUES
-	(
-		:google_id,
-		:username,
-		:firstname,
-		:lastname,
-		:email,
-		:password,
-		:is_edited,
-		:role_id
+		users (
+			google_id,
+			username,
+			firstname,
+			lastname,
+			email,
+			password,
+			is_edited,
+			role_id
+		)
+	VALUES
+		(
+			:google_id,
+			:username,
+			:firstname,
+			:lastname,
+			:email,
+			:password,
+			:is_edited,
+			:role_id
 	)
 `
 	UpdateGoogleId = `
-		UPDATE
+	UPDATE
 		users
 	SET
 		updated_at = NOW(),
@@ -78,6 +78,33 @@ VALUES
 	FROM
 		users u
     JOIN roles r ON u.role_id = r.id
+	`
+	selectProfile = `
+	SELECT
+		id,
+		username,
+		firstname,
+		lastname,
+		email
+	FROM
+		users 
+	`
+
+	updateProfile = `
+	UPDATE
+		users
+	SET
+		username = :username,
+		firstname = :firstname,
+		lastname = :lastname,
+		email = :email,
+		is_edited = :is_edited,
+		updated_at = NOW()
+	WHERE
+		id = :id
+	`
+	deleteUser = `
+	DELETE FROM users
 	`
 )
 
@@ -107,6 +134,16 @@ func (r Repository) GetUserByIdentity(ctx context.Context, identity string) (*Us
 	return dest, nil
 }
 
+func (r Repository) GetUserByUsername(ctx context.Context, username string) (*UserModel, error) {
+	query := selectUser + " WHERE username = ?"
+	dest := &UserModel{}
+	err := r.db.GetContext(ctx, dest, query, username)
+	if err != nil {
+		return nil, err
+	}
+	return dest, nil
+}
+
 func (r Repository) GetUserByEmail(ctx context.Context, email string) (*UserModel, error) {
 	query := selectUser + " WHERE email = ?"
 	dest := UserModel{}
@@ -119,6 +156,32 @@ func (r Repository) GetUserByEmail(ctx context.Context, email string) (*UserMode
 
 func (r Repository) UpdateGoogleId(ctx context.Context, google_id, email string) error {
 	_, err := r.db.ExecContext(ctx, UpdateGoogleId, google_id, email)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r Repository) GetProfil(ctx context.Context, id string) (*Profile, error) {
+	query := selectProfile + " WHERE id = ?"
+	dest := &Profile{}
+	err := r.db.GetContext(ctx, dest, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return dest, nil
+}
+
+func (r Repository) UpdateProfileById(ctx context.Context, params UpdateProfileModel) error {
+	_, err := r.db.NamedExecContext(ctx, updateProfile, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r Repository) DeleteUserById(id string) error {
+	_, err := r.db.Exec(deleteUser+" WHERE id = ?", id)
 	if err != nil {
 		return err
 	}
