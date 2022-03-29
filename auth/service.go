@@ -66,10 +66,11 @@ func (s Service) Login(ctx context.Context, params LoginParams) (*LoginResponse,
 		return nil, errors.New("password didn't match")
 	}
 	data := map[string]string{
-		"id":       strconv.Itoa(user.ID),
-		"username": user.Username,
-		"email":    user.Email,
-		"role":     user.Role,
+		"id":        strconv.Itoa(user.ID),
+		"username":  user.Username,
+		"firstname": user.Firstname,
+		"email":     user.Email,
+		"role":      user.Role,
 	}
 	token, err := utils.GenerateToken(config.Secret, config.ExpiredDuration, data)
 	if err != nil {
@@ -156,10 +157,6 @@ func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleRespo
 		}
 
 		user = NewUser
-
-		// err no rows
-		// lanjut create user baru
-		// get data baru -> ambil id
 	}
 
 	if user.GoogleId == nil {
@@ -169,15 +166,14 @@ func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleRespo
 		}
 	}
 
-	fmt.Println("USER ID => ", user.ID)
-
 	isiData := map[string]string{
-		"id":       fmt.Sprint(user.ID),
-		"username": user.Username,
-		"email":    user.Email,
-		"role":     user.Role,
+		"id":        fmt.Sprint(user.ID),
+		"username":  user.Username,
+		"firstname": user.Firstname,
+		"email":     user.Email,
+		"role":      user.Role,
 	}
-	// fmt.Pritln()
+
 	token, err := utils.GenerateToken(config.Secret, config.ExpiredDuration, isiData)
 	if err != nil {
 		return nil, err
@@ -191,4 +187,46 @@ func (s Service) registerGoogleAuth(ctx context.Context, data *Oauth2GoogleRespo
 		Token:    *token,
 	}
 	return result, nil
+}
+
+func (s Service) GetUSer(ctx context.Context, id string) (*Profile, error) {
+	get, err := s.repository.GetProfil(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return get, nil
+}
+
+func (s Service) EditUser(ctx context.Context, params UpdateProfileParam, id string) (*string, error) {
+	name, _ := s.repository.GetUserByUsername(ctx, params.Username)
+	if name != nil {
+		return nil, errors.New("username in used")
+	}
+	email, _ := s.repository.GetUserByEmail(ctx, params.Email)
+	if email != nil {
+		return nil, errors.New("email in used")
+	}
+	updateProfile := UpdateProfileModel{
+		ID:        id,
+		Username:  params.Username,
+		Firstname: params.Firstname,
+		Lastname:  params.Lastname,
+		Email:     params.Email,
+		IsEdited:  false,
+	}
+	err := s.repository.UpdateProfileById(ctx, updateProfile)
+	if err != nil {
+		return nil, err
+	}
+	done := "YourProfileHasUpdated"
+	return &done, nil
+}
+
+func (s Service) DeleteUser(id string) error {
+	err := s.repository.DeleteUserById(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

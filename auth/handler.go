@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -77,12 +76,52 @@ func (h Handler) handleGoogleCallback(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("content =>", content)
-
 	data, err := h.service.registerGoogleAuth(ctx, content)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 	c.JSON(http.StatusOK, utils.Response(data))
+}
+
+func (h Handler) handleGetProfile(c *gin.Context) {
+	ctx := context.Background()
+	id := c.GetString("id")
+
+	data, err := h.service.GetUSer(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response(data))
+
+}
+
+func (h Handler) handleEditProfile(c *gin.Context) {
+	var params UpdateProfileParam
+	ctx := context.Background()
+	id := c.GetString("id")
+
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
+		return
+	}
+
+	data, err := h.service.EditUser(ctx, params, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response(data))
+
+}
+
+func (h Handler) handleDeleteProfile(c *gin.Context) {
+	id := c.GetString("id")
+	err := h.service.DeleteUser(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response("YourAccountHasDeleted"))
 }
