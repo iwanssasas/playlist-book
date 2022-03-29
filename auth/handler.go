@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -75,5 +76,13 @@ func (h Handler) handleGoogleCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, utils.Response(content))
+
+	fmt.Println("content =>", content)
+
+	data, err := h.service.registerGoogleAuth(ctx, content)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, utils.Response(data))
 }

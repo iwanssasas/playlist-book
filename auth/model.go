@@ -1,20 +1,24 @@
 package auth
 
 type RegistrationModel struct {
-	Username  string `db:"username"`
-	Firstname string `db:"firstname"`
-	Lastname  string `db:"lastname"`
-	Email     string `db:"email"`
-	Password  string `db:"password"`
-	RoleId    int    `db:"role_id"`
+	GoogleId  *string `db:"google_id"`
+	Username  string  `db:"username"`
+	Firstname string  `db:"firstname"`
+	Lastname  string  `db:"lastname"`
+	Email     string  `db:"email"`
+	Password  string  `db:"password"`
+	IsEdited  bool    `db:"is_edited"`
+	RoleId    int     `db:"role_id"`
 }
 
 type UserModel struct {
-	ID        int    `db:"id"`
-	Username  string `db:"username"`
-	Firstname string `db:"firstname"`
-	Lastname  string `db:"lastname"`
-	Email     string `db:"email"`
-	Password  string `db:"password"`
-	Role      string `db:"role"`
+	ID        int     `db:"id"`
+	GoogleId  *string `db:"google_id"`
+	Username  string  `db:"username"`
+	Firstname string  `db:"firstname"`
+	Lastname  string  `db:"lastname"`
+	Email     string  `db:"email"`
+	Password  string  `db:"password"`
+	IsEdited  bool    `db:"is_edited"`
+	Role      string  `db:"role"`
 }
